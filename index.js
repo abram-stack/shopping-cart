@@ -1,4 +1,4 @@
-import { ref, push, onValue } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js'
+import { ref, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js'
 import {database} from './appSettings.js'
 
 
@@ -21,12 +21,15 @@ addBtnEl.addEventListener('click', function () {
 
 
 onValue(shoppingListsDB, function (snapshot) {
-  let dataFromDB = Object.values(snapshot.val())
-  
-  shoppingListEl.innerHTML = ''
-
-  for (let i = 0; i < dataFromDB.length; i++){
-    renderToShoppingListEl(dataFromDB[i])
+  if (snapshot.exists()) {
+    let items = Object.entries(snapshot.val())
+    shoppingListEl.innerHTML = ''
+    for (let i = 0; i < items.length; i++){
+      let currentItem = items[i]
+      renderToShoppingListEl(currentItem)
+    }
+  } else {
+    shoppingListEl.innerHTML = `no items`
   }
 })
 
@@ -37,6 +40,19 @@ function clearInputField() {
 }
 
 
-function renderToShoppingListEl(itemValue) {
-  shoppingListEl.innerHTML += `<li>${itemValue}</li>`
+function renderToShoppingListEl(item) {
+  let itemID = item[0]
+  let itemValue = item[1]
+  let newLi = document.createElement('li')
+
+  newLi.textContent = `${itemValue}`
+
+  shoppingListEl.append(newLi)
+  
+  
+  newLi.addEventListener('click', function () {
+    const dataInDb = ref(database, `shoppingList/${itemID}`)
+    remove(dataInDb)    
+  })
+
 }
