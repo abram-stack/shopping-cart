@@ -7,15 +7,17 @@ const shoppingListsDB = ref(database, 'shoppingList')
 const inputFieldEl = document.querySelector('#input-field')
 const addBtnEl = document.querySelector('#add-button')
 const shoppingListEl = document.querySelector('#shopping-list')
-
+const dialogEl = document.querySelector('#dialog')
 
 addBtnEl.addEventListener('click', function () {
-  push(shoppingListsDB, inputFieldEl.value)
-  clearInputField()
-
-  console.log(`${inputFieldEl.value} has been added`)
+  if (inputFieldEl.value) {
+    push(shoppingListsDB, inputFieldEl.value)
+    console.log(`${inputFieldEl.value} has been added`)
+    clearInputField()
+  } else { 
+      dialogEl.textContent = `Cannot insert empty element` 
+  }
 })
-
 
 
 onValue(shoppingListsDB, function (snapshot) {
@@ -31,6 +33,7 @@ onValue(shoppingListsDB, function (snapshot) {
 
 function clearInputField() {
   inputFieldEl.value = ''
+  dialogEl.textContent = ''
 }
 
 
